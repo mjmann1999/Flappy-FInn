@@ -1,4 +1,4 @@
-/****************************/
+/****************************
 /*    FLAPPY BIRD CLONE     */
 /****************************/
 
@@ -8,19 +8,14 @@ const ctx = canvas.getContext('2d');
 
 /* Game State Management */
 const gameState = {
-  current: 'loading', // 'loading', 'start', 'playing', 'gameover'
+  current: 'start', // can be: 'start', 'playing', 'gameover'
 };
-
-/* Load bird image */
-const birdImage = new Image();
-birdImage.src = 'assets/images/Finn.PNG';
 
 /* Bird object */
 const bird = {
   x: 50,
   y: canvas.height / 2,
-  width: 34, // Adjust based on your image dimensions
-  height: 24, // Adjust based on your image dimensions
+  radius: 12,
   velocity: 0,
   gravity: 0.5,
   flapStrength: -10,
@@ -35,7 +30,11 @@ const bird = {
   },
 
   draw() {
-    ctx.drawImage(birdImage, this.x, this.y, this.width, this.height);
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = 'yellow';
+    ctx.fill();
+    ctx.closePath();
   },
 };
 
@@ -77,17 +76,17 @@ let lastPipeTime = Date.now();
 /* Scoring */
 let score = 0;
 
-/****************************/
+/****************************
 /*       HELPER FUNCTIONS   */
 /****************************/
 
 /* Check collision with pipes */
 function checkCollision(pipe) {
   // Bird boundaries
-  const birdLeft = bird.x;
-  const birdRight = bird.x + bird.width;
-  const birdTop = bird.y;
-  const birdBottom = bird.y + bird.height;
+  const birdLeft = bird.x - bird.radius;
+  const birdRight = bird.x + bird.radius;
+  const birdTop = bird.y - bird.radius;
+  const birdBottom = bird.y + bird.radius;
 
   // Pipe boundaries
   const pipeLeft = pipe.x;
@@ -96,7 +95,10 @@ function checkCollision(pipe) {
   // Horizontal overlap
   if (birdRight > pipeLeft && birdLeft < pipeRight) {
     // If bird is above top pipe OR below bottom pipe
-    if (birdTop < pipe.topHeight || birdBottom > canvas.height - pipe.bottomHeight) {
+    if (
+      birdTop < pipe.topHeight ||
+      birdBottom > canvas.height - pipe.bottomHeight
+    ) {
       return true;
     }
   }
@@ -105,7 +107,7 @@ function checkCollision(pipe) {
 
 /* Check collision with ground/ceiling */
 function checkBoundaryCollision() {
-  if (bird.y < 0 || bird.y + bird.height > canvas.height) {
+  if (bird.y - bird.radius < 0 || bird.y + bird.radius > canvas.height) {
     return true;
   }
   return false;
@@ -130,7 +132,7 @@ function resetGame() {
   lastPipeTime = Date.now();
 }
 
-/****************************/
+/****************************
 /*         GAME LOOP        */
 /****************************/
 
@@ -171,7 +173,7 @@ function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Draw bird
-  if (gameState.current !== 'loading') {
+  if (gameState.current !== 'start') {
     bird.draw();
   }
 
@@ -188,9 +190,7 @@ function render() {
   }
 
   // Handle game states
-  if (gameState.current === 'loading') {
-    drawLoadingScreen();
-  } else if (gameState.current === 'start') {
+  if (gameState.current === 'start') {
     drawStartScreen();
   } else if (gameState.current === 'gameover') {
     drawGameOverScreen();
@@ -203,25 +203,9 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-// Start the game loop only after the bird image has loaded
-birdImage.onload = function () {
-  gameState.current = 'start'; // Ready to start
-  gameLoop();
-};
-
-/****************************/
+/****************************
 /*      DRAWING SCREENS     */
 /****************************/
-
-function drawLoadingScreen() {
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-  ctx.fillRect(0, canvas.height / 2 - 25, canvas.width, 50);
-
-  ctx.fillStyle = 'white';
-  ctx.font = '24px Arial';
-  ctx.textAlign = 'center';
-  ctx.fillText('Loading...', canvas.width / 2, canvas.height / 2 + 5);
-}
 
 function drawStartScreen() {
   ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
@@ -249,7 +233,7 @@ function drawGameOverScreen() {
   ctx.fillText('Press SPACE or CLICK to Restart', canvas.width / 2, canvas.height / 2 + 50);
 }
 
-/****************************/
+/****************************
 /*      INPUT HANDLING      */
 /****************************/
 
@@ -279,3 +263,6 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('click', () => {
   handleInput();
 });
+
+// Start the game loop
+gameLoop();
