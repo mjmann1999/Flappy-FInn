@@ -1,10 +1,20 @@
-/****************************
+/****************************/
 /*    FLAPPY BIRD CLONE     */
 /****************************/
 
 /* Grab the canvas and context */
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+
+/****************************/
+/*     RESPONSIVE CANVAS    */
+/****************************/
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas(); // Initial sizing
 
 /* Game State Management */
 const gameState = {
@@ -42,10 +52,12 @@ const bird = {
 class Pipe {
   constructor() {
     this.width = 60;
-    this.gap = 150;
+    this.gap = 200; // Increase gap to make game easier
     this.speed = 2;
     this.x = canvas.width;
+    // Randomize top pipe height (up to half the canvas)
     this.topHeight = Math.random() * (canvas.height / 2);
+    // The rest is bottom pipe
     this.bottomHeight = canvas.height - (this.topHeight + this.gap);
     this.passed = false; // track if we scored a point
   }
@@ -76,7 +88,7 @@ let lastPipeTime = Date.now();
 /* Scoring */
 let score = 0;
 
-/****************************
+/****************************/
 /*       HELPER FUNCTIONS   */
 /****************************/
 
@@ -132,7 +144,7 @@ function resetGame() {
   lastPipeTime = Date.now();
 }
 
-/****************************
+/****************************/
 /*         GAME LOOP        */
 /****************************/
 
@@ -172,7 +184,7 @@ function render() {
   // Clear canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Draw bird
+  // Draw bird (only after 'start' state is over)
   if (gameState.current !== 'start') {
     bird.draw();
   }
@@ -182,7 +194,7 @@ function render() {
     pipe.draw();
   });
 
-  // Draw score
+  // Draw score (during playing or gameover)
   if (gameState.current === 'playing' || gameState.current === 'gameover') {
     ctx.fillStyle = 'white';
     ctx.font = '24px Arial';
@@ -203,7 +215,7 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-/****************************
+/****************************/
 /*      DRAWING SCREENS     */
 /****************************/
 
@@ -216,7 +228,7 @@ function drawStartScreen() {
   ctx.textAlign = 'center';
   ctx.fillText('Flappy Bird Clone', canvas.width / 2, canvas.height / 2 - 10);
   ctx.font = '20px Arial';
-  ctx.fillText('Press SPACE or CLICK to Start', canvas.width / 2, canvas.height / 2 + 20);
+  ctx.fillText('Press SPACE or TAP to Start', canvas.width / 2, canvas.height / 2 + 20);
 }
 
 function drawGameOverScreen() {
@@ -230,10 +242,10 @@ function drawGameOverScreen() {
   ctx.font = '24px Arial';
   ctx.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + 25);
   ctx.font = '20px Arial';
-  ctx.fillText('Press SPACE or CLICK to Restart', canvas.width / 2, canvas.height / 2 + 50);
+  ctx.fillText('Press SPACE or TAP to Restart', canvas.width / 2, canvas.height / 2 + 50);
 }
 
-/****************************
+/****************************/
 /*      INPUT HANDLING      */
 /****************************/
 
@@ -260,9 +272,10 @@ document.addEventListener('keydown', (e) => {
 });
 
 // Mouse/Touch control
-document.addEventListener('click', () => {
-  handleInput();
-});
+document.addEventListener('click', handleInput);
+document.addEventListener('touchstart', handleInput, { passive: false });
 
-// Start the game loop
+/****************************/
+/*        START GAME        */
+/****************************/
 gameLoop();
