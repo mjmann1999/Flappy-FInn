@@ -1,22 +1,23 @@
 /* Basic reset */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  /* Body styling */
-  body {
-    background-color: #70c5ce; /* Light sky blue */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    font-family: Arial, sans-serif;
-  }
-  
-  /* Center the canvas and give it a subtle border */
-  canvas {
-    border: 2px solid #000;
-    background-color: #70c5ce;
-  }
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body styling */
+body, html {
+  height: 100%;
+  /* Prevent scrolling on mobile */
+  overflow: hidden;
+  touch-action: none; /* Disables gestures like scroll on canvas */
+  background-color: #70c5ce; /* Light sky blue */
+  font-family: Arial, sans-serif;
+}
+
+/* Make the canvas fill the browser window */
+canvas {
+  display: block;
+  /* Canvas dimensions will be set by script.js */
+  background-color: #70c5ce;
+}
